@@ -6,7 +6,7 @@
 // <button type="button" data-stop>Stop</button>
 
 // Напиши скрипт, який після натискання кнопки «Start», раз на секунду змінює колір фону <body> на випадкове значення,
-// використовуючи інлайн стиль.Натисканням на кнопку «Stop» зміна кольору фону повинна зупинятися.
+// використовуючи інлайн стиль. Натисканням на кнопку «Stop» зміна кольору фону повинна зупинятися.
 
 // УВАГА
 // Враховуй, що на кнопку «Start» можна натиснути нескінченну кількість разів.
@@ -21,10 +21,6 @@ const refs = {
 };
 
 let timerId = null;
-
-console.log(refs.start);
-console.log(refs.stop);
-console.log(refs.body);
 
 refs.start.addEventListener('click', onClickStart);
 refs.stop.addEventListener('click', onClickStop);
