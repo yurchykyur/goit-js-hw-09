@@ -8,28 +8,6 @@
 // HTML містить готову розмітку таймера, поля вибору кінцевої дати і кнопку, по кліку на яку, таймер повинен запускатися.
 // Додай мінімальне оформлення елементів інтерфейсу.
 
-// <input type="text" id="datetime-picker" />
-// <button type="button" data-start>Start</button>
-
-// <div class="timer">
-//   <div class="field">
-//     <span class="value" data-days>00</span>
-//     <span class="label">Days</span>
-//   </div>
-//   <div class="field">
-//     <span class="value" data-hours>00</span>
-//     <span class="label">Hours</span>
-//   </div>
-//   <div class="field">
-//     <span class="value" data-minutes>00</span>
-//     <span class="label">Minutes</span>
-//   </div>
-//   <div class="field">
-//     <span class="value" data-seconds>00</span>
-//     <span class="label">Seconds</span>
-//   </div>
-// </div>
-
 // Бібліотека flatpickr
 // Використовуй бібліотеку flatpickr для того, щоб дозволити користувачеві кросбраузерно вибрати кінцеву дату
 // і час в одному елементі інтерфейсу.
@@ -48,16 +26,6 @@
 // Ми підготували для тебе об'єкт, який потрібен для виконання завдання.
 // Розберися, за що відповідає кожна властивість в документації «Options», і використовуй його у своєму коді.
 // https://flatpickr.js.org/options/
-
-// const options = {
-//   enableTime: true,
-//   time_24hr: true,
-//   defaultDate: new Date(),
-//   minuteIncrement: 1,
-//   onClose(selectedDates) {
-//     console.log(selectedDates[0]);
-//   },
-// };
 
 // Вибір дати
 // Метод onClose() з об'єкта параметрів викликається щоразу під час закриття елемента інтерфейсу, який створює flatpickr.
@@ -80,29 +48,6 @@
 
 // Для підрахунку значень використовуй готову функцію convertMs, де ms - різниця між кінцевою і поточною датою в мілісекундах.
 
-// function convertMs(ms) {
-//    Number of milliseconds per unit of time
-//   const second = 1000;
-//   const minute = second * 60;
-//   const hour = minute * 60;
-//   const day = hour * 24;
-
-//    Remaining days
-//   const days = Math.floor(ms / day);
-//    Remaining hours
-//   const hours = Math.floor((ms % day) / hour);
-//    Remaining minutes
-//   const minutes = Math.floor(((ms % day) % hour) / minute);
-//    Remaining seconds
-//   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
-
-//   return { days, hours, minutes, seconds };
-// }
-
-// console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-// console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-// console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
-
 // Форматування часу
 // Функція convertMs() повертає об'єкт з розрахованим часом, що залишився до кінцевої дати.
 // Зверни увагу, що вона не форматує результат.Тобто, якщо залишилося 4 хвилини або будь - якої іншої складової часу,
@@ -117,3 +62,104 @@
 
 // Для відображення повідомлень користувачеві, замість window.alert(), використовуй бібліотеку notiflix.
 // https://github.com/notiflix/Notiflix#readme
+
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+require('flatpickr/dist/themes/material_blue.css');
+
+const refs = {
+  fpItem: document.querySelector('#datetime-picker'),
+  buttonStart: document.querySelector('button[data-start]'),
+  days: document.querySelector('span[data-days]'),
+  hours: document.querySelector('span[data-hours]'),
+  minutes: document.querySelector('span[data-minutes]'),
+  seconds: document.querySelector('span[data-seconds]'),
+};
+
+let timerId = null;
+let userSelectedDates = {};
+let timeMS = 0;
+
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    timeMS = Date.parse(selectedDates[0]) - Date.parse(new Date());
+    revisingDateInFuture(timeMS);
+  },
+};
+
+const fp = flatpickr(refs.fpItem, options);
+refs.buttonStart.setAttribute('disabled', '');
+
+function onClickButtonStart(e) {
+  userSelectedDates = convertMs(timeMS);
+  addLeadingZero(userSelectedDates);
+  updateTimeLess(userSelectedDates);
+
+  timerId = setInterval(() => {
+    updateTimeLess(userSelectedDates);
+    timeMS -= 1000;
+    userSelectedDates = convertMs(timeMS);
+    addLeadingZero(userSelectedDates);
+    reviseWhenNeedStopInterval(timeMS, timerId);
+  }, 1000);
+}
+
+function reviseWhenNeedStopInterval(time, timerId) {
+  if (time === -1000) {
+    clearInterval(timerId);
+  }
+}
+
+function revisingDateInFuture(time) {
+  if (time < 0) {
+    Notify.failure('Please choose a date in the future', {
+      width: '350px',
+      position: 'center-top',
+      fontSize: '16px',
+    });
+  } else {
+    refs.buttonStart.removeAttribute('disabled');
+    refs.buttonStart.addEventListener('click', onClickButtonStart, {
+      once: true,
+    });
+  }
+}
+
+function updateTimeLess(obj) {
+  const { days, hours, minutes, seconds } = obj;
+  refs.days.textContent = days;
+  refs.hours.textContent = hours;
+  refs.minutes.textContent = minutes;
+  refs.seconds.textContent = seconds;
+}
+
+function addLeadingZero(value) {
+  const keys = Object.keys(value);
+  for (const key of keys) {
+    value[key] = String(value[key]).padStart(2, '0');
+  }
+}
+
+function convertMs(ms) {
+  //  Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  //  Remaining days
+  const days = Math.floor(ms / day);
+  //  Remaining hours
+  const hours = Math.floor((ms % day) / hour);
+  //  Remaining minutes
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  //  Remaining seconds
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+  return { days, hours, minutes, seconds };
+}
