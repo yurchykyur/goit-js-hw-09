@@ -96,6 +96,10 @@ const fp = flatpickr(refs.fpItem, options);
 refs.buttonStart.setAttribute('disabled', '');
 
 function onClickButtonStart(e) {
+  userSelectedDates = convertMs(timeMS);
+  addLeadingZero(userSelectedDates);
+  updateTimeLess(userSelectedDates);
+
   timerId = setInterval(() => {
     updateTimeLess(userSelectedDates);
     timeMS -= 1000;
