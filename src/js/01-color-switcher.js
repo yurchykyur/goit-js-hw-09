@@ -29,7 +29,6 @@ function onClickStart(e) {
   refs.start.setAttribute('disabled', '');
   timerId = setInterval(() => {
     const bodyBackgroundColor = getRandomHexColor();
-    console.log(bodyBackgroundColor);
     refs.body.style.backgroundColor = bodyBackgroundColor;
   }, 1000);
 }
