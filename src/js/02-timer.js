@@ -86,19 +86,23 @@ const options = {
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
+  clickOpens: true,
   onClose(selectedDates) {
     timeMS = Date.parse(selectedDates[0]) - Date.parse(new Date());
     revisingDateInFuture(timeMS);
   },
 };
 
-const fp = flatpickr(refs.fpItem, options);
+let fp = flatpickr(refs.fpItem, options);
 refs.buttonStart.setAttribute('disabled', '');
 
 function onClickButtonStart(e) {
+  refs.buttonStart.setAttribute('disabled', '');
   userSelectedDates = convertMs(timeMS);
   addLeadingZero(userSelectedDates);
   updateTimeLess(userSelectedDates);
+  options.clickOpens = false;
+  fp = flatpickr(refs.fpItem, options);
 
   timerId = setInterval(() => {
     updateTimeLess(userSelectedDates);
