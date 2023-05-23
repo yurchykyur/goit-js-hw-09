@@ -23,19 +23,26 @@ const refs = {
 let timerId = null;
 
 refs.start.addEventListener('click', onClickStart);
-refs.stop.addEventListener('click', onClickStop);
+refs.stop.setAttribute('disabled', '');
 
 function onClickStart(e) {
   refs.start.setAttribute('disabled', '');
+  let bodyBackgroundColor = getRandomHexColor();
+  refs.body.style.backgroundColor = bodyBackgroundColor;
+
   timerId = setInterval(() => {
-    const bodyBackgroundColor = getRandomHexColor();
+    bodyBackgroundColor = getRandomHexColor();
     refs.body.style.backgroundColor = bodyBackgroundColor;
   }, 1000);
+
+  refs.stop.addEventListener('click', onClickStop);
+  refs.stop.removeAttribute('disabled');
 }
 
 function onClickStop(e) {
   clearInterval(timerId);
   refs.start.removeAttribute('disabled');
+  refs.stop.setAttribute('disabled', '');
 }
 
 function getRandomHexColor() {
