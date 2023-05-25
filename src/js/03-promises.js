@@ -27,20 +27,34 @@ const refs = {
   formInputs: document.querySelectorAll('.form input'),
   buttonCreatePromises: document.querySelector('button[type="submit"]'),
 };
+
 refs.form.addEventListener('submit', onClickButtonCreatePromises);
 
+/**
+ * triggers on the submit event and starts functions for creating promises and launching them
+ * @param {submit} e event
+ */
 function onClickButtonCreatePromises(e) {
   e.preventDefault();
   const promises = creatingPromises();
   startingAllPromises(promises);
 }
 
+/**
+ * the function creates an array of promises, for this it runs functions to create an object from the data entered in the input,
+ * to create an array from data to create promises
+ * @returns returns an array of created promises
+ */
 function creatingPromises() {
   const objInputsValue = createObjFromInputData(refs.formInputs);
   const arrayDataPromises = createArrayDataPromises(objInputsValue);
   return createArrayPromises(arrayDataPromises);
 }
 
+/**
+ * the function iterates the array of created promises and adds to then and catch
+ * @param {Array} promises
+ */
 function startingAllPromises(promises) {
   for (const promise of promises) {
     promise
@@ -53,6 +67,12 @@ function startingAllPromises(promises) {
   }
 }
 
+/**
+ * the function creates a new transaction based on the corresponding values of position and delay
+ * @param {Number} position
+ * @param {Number} delay
+ * @returns
+ */
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
   return new Promise((resolve, reject) => {
@@ -66,10 +86,20 @@ function createPromise(position, delay) {
   });
 }
 
+/**
+ * function creates promises based on the passed array of data to create promises
+ * @param {Array} arr
+ * @returns returns an array of created promises
+ */
 function createArrayPromises(arr) {
   return arr.map(({ position, delay }) => createPromise(position, delay));
 }
 
+/**
+ * the function creates a data array for promises with the number of elements according to the number entered by the user
+ * @param {Object} obj
+ * @returns array of data to create promises
+ */
 function createArrayDataPromises(obj) {
   const arr = [];
   for (let i = 1; i <= obj.amount; i += 1) {
@@ -80,6 +110,11 @@ function createArrayDataPromises(obj) {
   return arr;
 }
 
+/**
+ * the function processes the data entered by the user by creating an object
+ * @param {Object} inputs
+ * @returns  an object with user-entered data in inputs
+ */
 function createObjFromInputData(inputs) {
   const obj = {};
   inputs.forEach(elem => {

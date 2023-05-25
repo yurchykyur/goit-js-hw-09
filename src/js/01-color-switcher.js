@@ -25,6 +25,10 @@ let timerId = null;
 refs.start.addEventListener('click', onClickStart);
 refs.stop.setAttribute('disabled', '');
 
+/**
+ * the function processes the click on the start button
+ * @param {Click} e event
+ */
 function onClickStart(e) {
   refs.start.setAttribute('disabled', '');
   let bodyBackgroundColor = getRandomHexColor();
@@ -39,12 +43,20 @@ function onClickStart(e) {
   refs.stop.removeAttribute('disabled');
 }
 
+/**
+ * the function handles the click on the stop button
+ * @param {Click} e event
+ */
 function onClickStop(e) {
   clearInterval(timerId);
   refs.start.removeAttribute('disabled');
   refs.stop.setAttribute('disabled', '');
 }
 
+/**
+ * function to create an arbitrary color in hex format
+ * @returns returns an arbitrary color in hex format
+ */
 function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215)
     .toString(16)
