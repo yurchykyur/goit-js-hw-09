@@ -13,14 +13,7 @@
 // і час в одному елементі інтерфейсу.
 // Для того щоб підключити CSS код бібліотеки в проект, необхідно додати ще один імпорт, крім того, що описаний в документації.
 
-//  Описаний в документації
-// import flatpickr from "flatpickr";
-//  Додатковий імпорт стилів
-// import "flatpickr/dist/flatpickr.min.css";
-
 // Бібліотека очікує, що її ініціалізують на елементі input[type="text"], тому ми додали до HTML документу поле input#datetime-picker.
-
-// <input type="text" id="datetime-picker" />
 
 // Другим аргументом функції flatpickr(selector, options) можна передати необов'язковий об'єкт параметрів.
 // Ми підготували для тебе об'єкт, який потрібен для виконання завдання.
@@ -93,31 +86,8 @@ const options = {
   },
 };
 
-let fp = flatpickr(refs.fpItem, options);
+let inputFlatpickr = flatpickr(refs.fpItem, options);
 refs.buttonStart.setAttribute('disabled', '');
-
-function onClickButtonStart(e) {
-  refs.buttonStart.setAttribute('disabled', '');
-  userSelectedDates = convertMs(timeMS);
-  addLeadingZero(userSelectedDates);
-  updateTimeLess(userSelectedDates);
-  options.clickOpens = false;
-  fp = flatpickr(refs.fpItem, options);
-
-  timerId = setInterval(() => {
-    updateTimeLess(userSelectedDates);
-    timeMS -= 1000;
-    userSelectedDates = convertMs(timeMS);
-    addLeadingZero(userSelectedDates);
-    reviseWhenNeedStopInterval(timeMS, timerId);
-  }, 1000);
-}
-
-function reviseWhenNeedStopInterval(time, timerId) {
-  if (time === -1000) {
-    clearInterval(timerId);
-  }
-}
 
 function revisingDateInFuture(time) {
   if (time < 0) {
@@ -127,10 +97,47 @@ function revisingDateInFuture(time) {
       fontSize: '16px',
     });
   } else {
-    refs.buttonStart.removeAttribute('disabled');
-    refs.buttonStart.addEventListener('click', onClickButtonStart, {
-      once: true,
-    });
+    enebleButtonStart();
+  }
+}
+
+function enebleButtonStart() {
+  refs.buttonStart.removeAttribute('disabled');
+  refs.buttonStart.addEventListener('click', onClickButtonStart, {
+    once: true,
+  });
+}
+
+function onClickButtonStart(e) {
+  refs.buttonStart.setAttribute('disabled', '');
+  processingTimerValue(timeMS);
+  updateDataFlatpickr();
+
+  onCounterTimer();
+}
+
+function processingTimerValue(timeMS) {
+  userSelectedDates = convertMs(timeMS);
+  addLeadingZero(userSelectedDates);
+  updateTimeLess(userSelectedDates);
+}
+
+function updateDataFlatpickr() {
+  options.clickOpens = false;
+  inputFlatpickr = flatpickr(refs.fpItem, options);
+}
+
+function onCounterTimer() {
+  timerId = setInterval(() => {
+    timeMS -= 1000;
+    processingTimerValue(timeMS);
+    reviseWhenNeedStopInterval(timeMS, timerId);
+  }, 1000);
+}
+
+function reviseWhenNeedStopInterval(time, timerId) {
+  if (time === -1000) {
+    clearInterval(timerId);
   }
 }
 
