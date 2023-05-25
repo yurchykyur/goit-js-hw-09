@@ -89,6 +89,11 @@ const options = {
 let inputFlatpickr = flatpickr(refs.fpItem, options);
 refs.buttonStart.setAttribute('disabled', '');
 
+/**
+ * the function checks whether the user specified a time in the future or not.
+ * If the condition is met, includes permission to press the button
+ * @param {Number} time
+ */
 function revisingDateInFuture(time) {
   if (time < 0) {
     Notify.failure('Please choose a date in the future', {
@@ -101,6 +106,9 @@ function revisingDateInFuture(time) {
   }
 }
 
+/**
+ * function removes the 'disabled' attribute and adds an event listener to the button
+ */
 function enebleButtonStart() {
   refs.buttonStart.removeAttribute('disabled');
   refs.buttonStart.addEventListener('click', onClickButtonStart, {
@@ -108,6 +116,11 @@ function enebleButtonStart() {
   });
 }
 
+/**
+ * the function after pressing the button blocks the button,
+ * starts the following functions for processing the data entered by the user and updating the data on the timer
+ * @param {Click} e event
+ */
 function onClickButtonStart(e) {
   refs.buttonStart.setAttribute('disabled', '');
   processingTimerValue(timeMS);
@@ -116,31 +129,50 @@ function onClickButtonStart(e) {
   onCounterTimer();
 }
 
+/**
+ * functions for processing the remaining time,
+ * @param {Number} timeMS
+ */
 function processingTimerValue(timeMS) {
   userSelectedDates = convertMs(timeMS);
   addLeadingZero(userSelectedDates);
   updateTimeLess(userSelectedDates);
 }
 
+/**
+ * the function updates the properties of the flatpickr module and re-initializes it
+ */
 function updateDataFlatpickr() {
   options.clickOpens = false;
   inputFlatpickr = flatpickr(refs.fpItem, options);
 }
 
+/**
+ * a function that counts down and calls a function for processing the remaining time
+ */
 function onCounterTimer() {
   timerId = setInterval(() => {
     timeMS -= 1000;
-    processingTimerValue(timeMS);
     reviseWhenNeedStopInterval(timeMS, timerId);
+    processingTimerValue(timeMS);
   }, 1000);
 }
 
+/**
+ * function to check whether it is necessary to stop setInterval()
+ * @param {Number} time
+ * @param {Number} timerId
+ */
 function reviseWhenNeedStopInterval(time, timerId) {
-  if (time === -1000) {
+  if (!time) {
     clearInterval(timerId);
   }
 }
 
+/**
+ * a function that updates the display of values on the page
+ * @param {Object} obj
+ */
 function updateTimeLess(obj) {
   const { days, hours, minutes, seconds } = obj;
   refs.days.textContent = days;
@@ -149,6 +181,10 @@ function updateTimeLess(obj) {
   refs.seconds.textContent = seconds;
 }
 
+/**
+ * a function that adds "0" if the value has one character
+ * @param {Object} value
+ */
 function addLeadingZero(value) {
   const keys = Object.keys(value);
   for (const key of keys) {
@@ -156,6 +192,11 @@ function addLeadingZero(value) {
   }
 }
 
+/**
+ * function that converts milliseconds to days, hours, minutes, seconds
+ * @param {Number} ms
+ * @returns an object with converted data in days, hours, minutes, seconds
+ */
 function convertMs(ms) {
   //  Number of milliseconds per unit of time
   const second = 1000;
